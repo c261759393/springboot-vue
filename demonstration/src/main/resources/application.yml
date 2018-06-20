@@ -1,0 +1,25 @@
+server:
+  port: 8082
+
+## 是否启动日志 SQL 语句
+spring:
+  jpa:
+    show-sql: false
+#    hibernate:
+#      ddl-auto: update
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/springbootdb?useUnicode=true&characterEncoding=utf8&useSSL=true
+    username: root
+    password: 123456
+
+## Redis 配置
+  redis:
+    database: 0
+    host: 192.168.107.128
+    port: 6379
+    password:
+
+logging:
+  config:
+    classpath: log4j2.xml
