@@ -1,2 +1,3 @@
 # springboot-vue
-把自己练习的项目提交上来
+最近练习的springboot+vue.js提交上来
+慢慢进阶
