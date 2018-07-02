@@ -82,30 +82,34 @@
         :total="pages">
       </el-pagination>
     </div>
-    <b-staff-model :dialogFormVisible="dialogFormVisible" :form="form" :provinces="provinces" :apiUrl="apiUrl" :options="options" v-on:canclemodal="dialogVisible"></b-staff-model>
+    <b-staff-model :dialogFormVisible="dialogFormVisible" :form="form" :provinces="provinces"
+                   :options="options" v-on:canclemodal="dialogVisible"></b-staff-model>
   </div>
 </template>
 
 <script>
   import BStaffModel from "./BStaffModel";
+  import request from "../../api/request";
+
   export default {
     name: "BStaff",
     components: {BStaffModel},
+    inject: ['reload'],
     data() {
       return {
         tableData: [],
         nameSearch: '',
         selectProvince: '',
-        apiUrl: "http://127.0.0.1:8082/api/",
-        pageNum: '1',
+        pageNum: 1,
         pages: 50,
         provinces: '',
-        dialogFormVisible:false,
-        form:{},
+        dialogFormVisible: false,
+        form: {},
         options: {
           submit: false,
           save: false
         },
+        totalCount: ''
       }
     },
     mounted() {
@@ -115,7 +119,11 @@
     methods: {
       //查询列表
       getStaff() {
-        this.$axios.get(this.apiUrl + 'staff?pageNum=' + this.pageNum+'&likeName='+this.nameSearch+"&likeProvince="+this.selectProvince).then((response) => {
+        request({
+          url: '/api/staff?pageNum=' + this.pageNum + '&likeName=' + this.nameSearch + "&likeProvince=" + this.selectProvince,
+          method: 'get'
+        }).then((response) => {
+          this.totalCount = response.data.totalCount
           this.pages = response.data.totalPages * 10
           this.tableData = response.data.list;
         }).catch((error) => {
@@ -123,10 +131,13 @@
         })
       },
       //获取省份内容
-      getProvinces(){
-        this.$axios.get(this.apiUrl + 'provinces').then((response)=>{
+      getProvinces() {
+        request({
+          methods: 'get',
+          url: '/api/provinces'
+        }).then((response) => {
           this.provinces = response.data
-        }).catch((error)=>{
+        }).catch((error) => {
           console.log(error)
         })
       },
@@ -137,51 +148,64 @@
         this.pageNum = btn;
         this.onQuery()
       },
-      sex(row, column, cellValue, index){
-        if (cellValue==1){
+      sex(row, column, cellValue, index) {
+        if (cellValue == 1) {
           return '男';
-        } if(cellValue==0){
+        }
+        if (cellValue == 0) {
           return '女';
         }
       },
-      dialogVisible(){
+      dialogVisible() {
         this.dialogFormVisible = false;
         this.options.submit = false;
         this.options.save = false;
         this.form = {};
         this.getStaff()
       },
-      onAdd(){
-        this.dialogFormVisible=true;
-        this.options.submit=true;
+      onAdd() {
+        this.dialogFormVisible = true;
+        this.options.submit = true;
       },
-      onEdit(index){
-        this.dialogFormVisible=true;
-        this.options.save=true;
+      onEdit(index) {
+        this.dialogFormVisible = true;
+        this.options.save = true;
         const editId = this.tableData[index].id;
-        const idurl = this.apiUrl + '/staff/' + editId;
-        this.$axios.get(idurl).then((response) => {
+        request({
+          url: '/api/staff/' + editId,
+          methods: 'get'
+        }).then((response) => {
           this.form = response.data;
-          console.log(response.data)
         }).catch(function (response) {
           console.log(response)
         })
       },
       deleteRow(index) {
         const delId = this.tableData[index].id;
-        this.$confirm('确定删除此城市?', '提示', {
+        this.$confirm('确定删除此员工信息?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning',
         }).then(() => {
-          this.$axios.delete(this.apiUrl + 'staff/' + delId).then(() => {
+          request({
+            method: 'delete',
+            url: '/api/staff/' + delId
+          }).then(() => {
             this.$message({
               type: 'success',
               message: '删除成功!'
             });
-            this.getStaff();
-          }).catch(function (response) {
-            console.log(response)
+            const m = (this.totalCount - 1) / 5
+            if (/^\d+$/.test(m)) {
+              console.log("减少一个页面")
+              this.pageNum -= 1
+              this.getStaff();
+            } else {
+              this.getStaff();
+            }
+            // this.reload();
+          }).catch(function (error) {
+            console.log(error)
           });
         }).catch(() => {
           this.$message({

@@ -7,7 +7,9 @@
       <i class="el-icon-bell" style="margin-right: 10px"></i>
       <el-dropdown @command="handleCommand">
         <span class="el-dropdown-link home_userinfo">
-          {{username}}<i><img src="../../assets/bo.jpg"/></i>
+          {{username}}<i v-if="src"><img :src="src"/></i>
+                      <i v-else class="el-icon-picture"></i>
+
         </span>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item command="admin">个人中心</el-dropdown-item>
@@ -20,19 +22,25 @@
 </template>
 
 <script>
+  import request from "../../api/request"
+
     export default {
         name: "BHeader",
       data(){
           return{
-            username:'系统管理员'
+            username:'',
+            src:''
           }
+      },
+      mounted() {
+        this.getAdmin();
       },
       methods:{
         handleCommand(index){
           if(index === "admin"){
-            console.log(11111)
+            this.$router.push({name:'self',params:{name:this.username}})
           }else if (index ==="setup"){
-            console.log(22222)
+            this.$router.replace({path:'/home/setting'})
           } else if (index === "logout"){
             this.$confirm('注销登录，是否继续','提示',{
               confirmButtonText:'确定',
@@ -47,6 +55,17 @@
               });
             })
           }
+        },
+        getAdmin() {
+          request({
+            url:'/api/self?username='+JSON.parse(localStorage.getItem('username')),
+            method:'get'
+          }).then((response)=>{
+            this.src = response.data.imgpath;
+            this.username = response.data.name;
+          }).catch((error) => {
+            console.log(error)
+          })
         }
       }
     }

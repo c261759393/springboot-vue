@@ -29,4 +29,20 @@ public class LoginAndRegisterServiceImpl implements LoginAndRegisterService {
             return true;
         }
     }
+
+    @Override
+    public User getUserByName(String name) {
+        return userRepository.findByName(name);
+    }
+
+    @Override
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    @Override
+    public User updateUser(User user) {
+        return userRepository.save(user);
+    }
+
 }

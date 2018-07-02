@@ -6,6 +6,8 @@ import BHome from '@/components/BHome'
 import BUser from '@/components/content/BUser'
 import BStaff from '@/components/content/BStaff'
 import Bhomer from '@/components/content/Bhomer'
+import BSelf from '@/components/content/BSelf'
+import BSetting from '@/components/content/BSetting'
 
 Vue.use(Router)
 
@@ -23,42 +25,30 @@ const router = new Router({
     },
     {
       path: '/home',
-      meta: {
-        requireAuth: true
-      },
       component: BHome,
       children: [
         {path: '', component: Bhomer},
-        {path: 'staff', component: BStaff},
-        {path: 'user', component: BUser}
+        {name:'staff',path: 'staff', component: BStaff},
+        {name:'user',path: 'user', component: BUser},
+        {name:'self',path: 'self', component: BSelf},
+        {name:'setting',path: 'setting', component: BSetting}
       ]
     }
   ]
 })
 
 router.beforeEach((to, from, next) => {
-  console.log(router)
-  next()
-  // if (to.meta.requireAuth) {
-  //   console.log(111111)
-  //   next()
-  // } else {
-  //   console.log(66666)
-  // }
-  // if (to.meta.requireAuth) {  // 判断该路由是否需要登录权限
-  //   if (store.state.token) {  // 通过vuex state获取当前的token是否存在
-  //     next();
-  //   }
-  //   else {
-  //     next({
-  //       path: '/login',
-  //       query: {redirect: to.fullPath}  // 将跳转的路由path作为参数，登录成功后跳转到该路由
-  //     })
-  //   }
-  // }
-  // else {
-  //   next();
-  // }
-})
+  if (to.path.startsWith('/login')) {
+    window.sessionStorage.removeItem('access-token')
+    next()
+  } else {
+    let token = window.sessionStorage.getItem('access-token')
+    if (!token) {
+      next({path: 'login'})
+    } else {
+      next()
+    }
+  }
+});
 
 export default router

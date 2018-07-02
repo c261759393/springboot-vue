@@ -23,7 +23,12 @@
     import BSider from "./content/BSider";
     export default {
         name: "BHome",
-      components: {BSider, BHeader}
+      components: {BSider, BHeader},
+      data(){
+          return{
+
+          }
+      }
     }
 </script>
 

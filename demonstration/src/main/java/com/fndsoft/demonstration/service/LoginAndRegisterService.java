@@ -15,4 +15,10 @@ public interface LoginAndRegisterService {
      * @return
      */
     public boolean verifyUser(User user);
+
+    public User getUserByName(String name);
+
+    public User findByUsername(String username);
+
+    public User updateUser(User user);
 }

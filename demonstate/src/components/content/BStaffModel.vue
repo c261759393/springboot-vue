@@ -42,6 +42,8 @@
 </template>
 
 <script>
+  import request from "../../api/request";
+
   export default {
     name: "BStaffModel",
     data() {
@@ -55,7 +57,7 @@
         }]
       }
     },
-    props: ['dialogFormVisible', 'form', 'provinces', 'options', 'apiUrl'],
+    props: ['dialogFormVisible', 'form', 'provinces', 'options'],
     methods: {
       handleClose() {
         this.$emit("canclemodal");
@@ -67,41 +69,47 @@
             message: '请选择省份',
             type: 'warning'
           });
-        }else if(this.form.sex == null){
+        } else if (this.form.sex == null) {
           this.$notify({
             title: '警告',
             message: '请选择性别',
             type: 'warning'
           });
-        }else if(this.form.name == null){
+        } else if (this.form.name == null) {
           this.$notify({
             title: '警告',
             message: '请填写姓名',
             type: 'warning'
           });
         } else {
-          this.$axios.post(this.apiUrl + 'staff', this.form).then(function (response) {
-            console.log(response)
-          }).catch(function (error) {
+          request({
+            method: 'post',
+            url: '/api/staff',
+            data: this.form
+          }).then((response) => {
+            this.handleClose();
+          }).catch((error) => {
             console.log(error)
           })
-          this.handleClose();
         }
       },
       onSave() {
-        if(this.form.name == '') {
+        if (this.form.name == '') {
           this.$notify({
             title: '警告',
             message: '请填写姓名',
             type: 'warning'
           });
-        }else {
-          this.$axios.put(this.apiUrl+'staff',this.form).then((response)=>{
-            console.log(response)
-          }).catch((error)=>{
+        } else {
+          request({
+            method: 'put',
+            url: '/api/staff',
+            data: this.form
+          }).then((response) => {
+            this.handleClose();
+          }).catch((error) => {
             console.log(error)
           })
-          this.handleClose();
         }
       },
       cancleModal() {
