@@ -19,7 +19,7 @@ public class UploadController {
     @RequestMapping(value = "/api/uploadimg", method = RequestMethod.POST)
     public @ResponseBody
     String uploadFiles(@RequestParam("file") MultipartFile file) throws Exception {
-        SFTPUtil sftpUtil = new SFTPUtil("root", "Chenbo123", "120.79.175.190", 22);
+        SFTPUtil sftpUtil = new SFTPUtil("root", "******", "120.79.175.190", 22);
         sftpUtil.login();
         InputStream inputStream = file.getInputStream();
         String fileName = UploadUtils.generateRandonFileName(file.getOriginalFilename());
